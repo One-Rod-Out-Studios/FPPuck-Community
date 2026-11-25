@@ -1,0 +1,1 @@
+FPPuck Community is an unofficial Android app for viewing FPHL schedules, scores, standings, teams, player stats, shots on goal, themes, favorites, and live play-by-play via public league pages. It uses public FPHL/HockeyShift data and media. Favorites and settings are stored on this device.

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.FPHL" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#090F14</item>
+        <item name="android:statusBarColor">#090F14</item>
+        <item name="android:navigationBarColor">#090F14</item>
+    </style>
+</resources>
