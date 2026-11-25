@@ -306,9 +306,7 @@ fun StandingRow(
                 favoriteTeams
 
     val totalWins =
-        team.regulationWins +
-                team.overtimeWins +
-                team.shootoutWins
+        team.wins
 
     Row(
         modifier = Modifier

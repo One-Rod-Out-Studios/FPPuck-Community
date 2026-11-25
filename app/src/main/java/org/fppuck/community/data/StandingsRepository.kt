@@ -9,7 +9,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONTokener
-import org.jsoup.Jsoup
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -83,9 +82,7 @@ object StandingsRepository {
                 withContext(
                     Dispatchers.Default
                 ) {
-                    parseStandings(
-                        renderedHtml
-                    )
+                    parseLeagueStandings(renderedHtml)
                 }
 
             if (parsed.isNotEmpty()) {
@@ -210,174 +207,4 @@ object StandingsRepository {
             }
         }
 
-    private fun parseStandings(
-        html: String
-    ): List<LeagueStanding> {
-
-        val document =
-            Jsoup.parse(html)
-
-        val standings =
-            mutableListOf<LeagueStanding>()
-
-        var currentDivision = ""
-
-        document.select("tr").forEach { row ->
-
-            val rowText =
-                row.text().trim()
-
-            when {
-
-                rowText.contains(
-                    "ATLANTIC DIVISION",
-                    ignoreCase = true
-                ) -> {
-                    currentDivision = "Atlantic"
-                }
-
-                rowText.contains(
-                    "GREAT LAKES DIVISION",
-                    ignoreCase = true
-                ) -> {
-                    currentDivision = "Great Lakes"
-                }
-
-                rowText.contains(
-                    "DELTA DIVISION",
-                    ignoreCase = true
-                ) -> {
-                    currentDivision = "Delta"
-                }
-
-                rowText.contains(
-                    "FRONTIER DIVISION",
-                    ignoreCase = true
-                ) -> {
-                    currentDivision = "Frontier"
-                }
-            }
-
-            val cells =
-                row.select("td")
-
-            if (cells.size < 9) {
-                return@forEach
-            }
-
-            val rank =
-                cells[0]
-                    .text()
-                    .trim()
-                    .toIntOrNull()
-                    ?: return@forEach
-
-            val team =
-                sampleTeams.firstOrNull { team ->
-
-                    val fullName =
-                        "${team.city} ${team.name}"
-
-                    rowText.contains(
-                        fullName,
-                        ignoreCase = true
-                    )
-                }
-                    ?: return@forEach
-
-            val conference =
-                when (currentDivision) {
-
-                    "Atlantic",
-                    "Great Lakes" ->
-                        "Eastern"
-
-                    "Delta",
-                    "Frontier" ->
-                        "Western"
-
-                    else ->
-                        ""
-                }
-
-            standings.add(
-                LeagueStanding(
-                    rank = rank,
-                    teamName =
-                        "${team.city} ${team.name}",
-                    division =
-                        currentDivision,
-                    conference =
-                        conference,
-                    gamesPlayed =
-                        cells[2]
-                            .text()
-                            .trim()
-                            .toIntOrNull()
-                            ?: 0,
-                    regulationWins =
-                        cells[3]
-                            .text()
-                            .trim()
-                            .toIntOrNull()
-                            ?: 0,
-                    losses =
-                        cells[4]
-                            .text()
-                            .trim()
-                            .toIntOrNull()
-                            ?: 0,
-                    overtimeLosses =
-                        cells[5]
-                            .text()
-                            .trim()
-                            .toIntOrNull()
-                            ?: 0,
-                    overtimeWins =
-                        cells[6]
-                            .text()
-                            .trim()
-                            .toIntOrNull()
-                            ?: 0,
-                    shootoutWins =
-                        cells[7]
-                            .text()
-                            .trim()
-                            .toIntOrNull()
-                            ?: 0,
-                    points =
-                        cells[8]
-                            .text()
-                            .trim()
-                            .toIntOrNull()
-                            ?: 0
-                )
-            )
-        }
-
-        return standings
-            .distinctBy {
-                it.teamName
-            }
-            .sortedWith(
-                compareBy<LeagueStanding> {
-                    divisionOrder(it.division)
-                }.thenBy {
-                    it.rank
-                }
-            )
-    }
-
-    private fun divisionOrder(
-        division: String
-    ): Int {
-
-        return when (division) {
-            "Atlantic" -> 1
-            "Great Lakes" -> 2
-            "Delta" -> 3
-            "Frontier" -> 4
-            else -> 5
-        }
-    }
 }

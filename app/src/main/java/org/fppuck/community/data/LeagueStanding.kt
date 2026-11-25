@@ -6,10 +6,8 @@ data class LeagueStanding(
     val division: String,
     val conference: String,
     val gamesPlayed: Int,
-    val regulationWins: Int,
+    val wins: Int,
     val losses: Int,
     val overtimeLosses: Int,
-    val overtimeWins: Int,
-    val shootoutWins: Int,
     val points: Int
 )

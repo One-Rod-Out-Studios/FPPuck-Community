@@ -1235,11 +1235,7 @@ private fun TeamOverview(
 ) {
 
     val wins =
-        standing?.let {
-            it.regulationWins +
-                    it.overtimeWins +
-                    it.shootoutWins
-        }
+        standing?.wins
 
     Column {
 
